@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReactGo · Session Bypass</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #0b1120;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid #334155;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .sub {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 16px;
+    }
+    .badge {
+      display: inline-block;
+      background: #0f172a;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #60a5fa;
+      border: 1px solid #334155;
+      margin-top: 4px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-top: 18px;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      color: #f1f5f9;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+    input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .emoji-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .emoji-btn {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 40px;
+      padding: 8px 16px;
+      font-size: 24px;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #f1f5f9;
+      line-height: 1;
+    }
+    .emoji-btn.selected {
+      border-color: #38bdf8;
+      background: #1e293b;
+      box-shadow: 0 0 12px #38bdf866;
+    }
+    .emoji-btn:hover {
+      transform: scale(1.05);
+    }
+    #selectedDisplay {
+      margin-top: 12px;
+      font-size: 15px;
+      color: #94a3b8;
+    }
+    #selectedDisplay span {
+      font-size: 26px;
+      margin-right: 6px;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+    .row > * {
+      flex: 1;
+    }
+    .submit-btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      border: none;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #0b1120;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 20px #38bdf833;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px #38bdf855;
+    }
+    .submit-btn:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 16px;
+      background: #0f172a;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 450px;
+      overflow-y: auto;
+      display: none;
+      font-family: 'Courier New', monospace;
+    }
+    #result.show {
+      display: block;
+    }
+    .success {
+      color: #4ade80;
+    }
+    .error {
+      color: #f87171;
+    }
+    .info {
+      color: #60a5fa;
+    }
+    .warning {
+      color: #fbbf24;
+    }
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+    }
+    .method-info {
+      background: #0f172a;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      border-left: 3px solid #38bdf8;
+      color: #94a3b8;
+    }
+    .method-info strong {
+      color: #e2e8f0;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .status-dot.success {
+      background: #4ade80;
+    }
+    .status-dot.failed {
+      background: #f87171;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>⚡ ReactGo Session Bypass</h1>
+  <div class="sub">
+    Bypass limit 2/hari dengan session rotation (seperti tab samaran)
+    <span class="badge">Metode: Session Rotation</span>
+  </div>
+
+  <div class="method-info">
+    <strong>🔄 Cara Kerja:</strong> Setiap request menggunakan <strong>session/cookie baru</strong> (seperti membuka tab samaran). 
+    Server menganggap setiap request adalah pengguna baru, sehingga limit 2/hari tidak berlaku.
+    <br />
+    <span class="warning">ℹ️ Admin mengizinkan metode ini untuk bypass limit.</span>
+  </div>
+
+  <form id="reactionForm">
+    <label for="urlInput">🔗 URL Postingan WhatsApp Channel</label>
+    <input type="url" id="urlInput" placeholder="https://whatsapp.com/channel/.../..." required />
+
+    <label>😊 Pilih Reaction (klik untuk pilih/batal)</label>
+    <div class="emoji-grid" id="emojiGrid">
+      <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
+      <button type="button" class="emoji-btn" data-emoji="😂">😂</button>
+      <button type="button" class="emoji-btn" data-emoji="😮">😮</button>
+      <button type="button" class="emoji-btn" data-emoji="😢">😢</button>
+      <button type="button" class="emoji-btn" data-emoji="😡">😡</button>
+      <button type="button" class="emoji-btn" data-emoji="👍">👍</button>
+      <button type="button" class="emoji-btn" data-emoji="👎">👎</button>
+      <button type="button" class="emoji-btn" data-emoji="🎉">🎉</button>
+      <button type="button" class="emoji-btn" data-emoji="✨">✨</button>
+      <button type="button" class="emoji-btn" data-emoji="😍">😍</button>
+      <button type="button" class="emoji-btn" data-emoji="💯">💯</button>
+      <button type="button" class="emoji-btn" data-emoji="🙌">🙌</button>
+    </div>
+    <div id="selectedDisplay">Belum ada reaction dipilih.</div>
+
+    <div class="row">
+      <div>
+        <label for="jumlahInput">📦 Jumlah Kirim</label>
+        <input type="number" id="jumlahInput" value="10" min="1" max="100" />
+      </div>
+      <div>
+        <label for="delayInput">⏱️ Jeda (ms)</label>
+        <input type="number" id="delayInput" value="500" min="100" step="100" />
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">🚀 Kirim Reaction (Session Rotation)</button>
+  </form>
+
+  <div id="result"></div>
+  <div class="footer">⏳ Setiap request menggunakan session baru → Bypass limit 2/hari</div>
+</div>
+
+<script>
+  (function() {
+    const form = document.getElementById('reactionForm');
+    const urlInput = document.getElementById('urlInput');
+    const emojiBtns = document.querySelectorAll('.emoji-btn');
+    const selectedDisplay = document.getElementById('selectedDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultDiv = document.getElementById('result');
+    const jumlahInput = document.getElementById('jumlahInput');
+    const delayInput = document.getElementById('delayInput');
+
+    let selectedEmojis = [];
+
+    emojiBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const emoji = this.dataset.emoji;
+        const index = selectedEmojis.indexOf(emoji);
+        if (index > -1) {
+          selectedEmojis.splice(index, 1);
+          this.classList.remove('selected');
+        } else {
+          if (selectedEmojis.length >= 6) {
+            alert('Maksimal 6 reaction.');
+            return;
+          }
+          selectedEmojis.push(emoji);
+          this.classList.add('selected');
+        }
+        updateDisplay();
+      });
+    });
+
+    function updateDisplay() {
+      if (selectedEmojis.length === 0) {
+        selectedDisplay.innerHTML = 'Belum ada reaction dipilih.';
+      } else {
+        selectedDisplay.innerHTML = 'Dipilih: ' + selectedEmojis.map(e => `<span>${e}</span>`).join(' ');
+      }
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const url = urlInput.value.trim();
+      const jumlah = parseInt(jumlahInput.value) || 1;
+      const delayMs = parseInt(delayInput.value) || 500;
+
+      if (!url) {
+        showResult('⚠️ Masukkan URL postingan.', 'error');
+        return;
+      }
+      if (selectedEmojis.length === 0) {
+        showResult('⚠️ Pilih minimal satu reaction.', 'error');
+        return;
+      }
+      if (jumlah < 1) {
+        showResult('⚠️ Jumlah minimal 1.', 'error');
+        return;
+      }
+      if (jumlah > 100) {
+        showResult('⚠️ Maksimal 100 request per batch.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = `⏳ Mengirim ${jumlah} request...`;
+      resultDiv.classList.remove('show');
+      showResult(`🔄 Memulai ${jumlah} request dengan session baru masing-masing...\n⏱️ Jeda: ${delayMs}ms`, 'info');
+
+      try {
+        const startTime = Date.now();
+        const response = await fetch('/api/react', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url,
+            emojis: selectedEmojis,
+            jumlah,
+            delayMs
+          })
+        });
+
+        const data = await response.json();
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+        if (response.ok && data.success) {
+          let resultHtml = `✅ Selesai dalam ${elapsed} detik\n`;
+          resultHtml += `📊 Sukses: ${data.data.successCount}, Gagal: ${data.data.failedCount}\n`;
+          resultHtml += `🔄 Metode: ${data.data.metode}\n\n`;
+          resultHtml += `📋 Detail per request:\n`;
+          resultHtml += `───\n`;
+          
+          data.data.results.forEach(r => {
+            const dot = r.success ? '🟢' : '🔴';
+            const statusText = r.success ? 'BERHASIL' : 'GAGAL';
+            resultHtml += `${dot} [${String(r.index).padStart(2, ' ')}] ${statusText} | Session: ${r.sessionId} | ${r.message}\n`;
+          });
+          
+          resultHtml += `───\n`;
+          resultHtml += `📝 ${data.data.note || ''}`;
+          
+          showResult(resultHtml, 'success');
+        } else {
+          showResult('❌ Gagal: ' + (data.message || 'Terjadi kesalahan.'), 'error');
+        }
+      } catch (err) {
+        showResult('❌ Error koneksi: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Kirim Reaction (Session Rotation)';
+      }
+    });
+
+    function showResult(msg, type = 'info', append = false) {
+      resultDiv.classList.add('show');
+      const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+      if (!append) {
+        resultDiv.innerHTML = `<div class="${className}">${msg}</div>`;
+      } else {
+        resultDiv.innerHTML += `<div class="${className}">${msg}</div>`;
+      }
+    }
+  })();
+</script>
+</body>
+</html>
