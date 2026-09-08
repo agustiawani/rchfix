@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Keyyss React – Kirim Reaksi Unlimited</title>
+    <title>Keyyss React – Kirim Reaksi</title>
     <style>
         * { box-sizing: border-box; margin: 0; }
         body {
@@ -47,6 +47,14 @@
             font-size: 13px;
             font-weight: 600;
         }
+        .badge-safe {
+            background: #16a34a;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
         label {
             display: block;
             font-weight: 600;
@@ -54,7 +62,7 @@
             margin-bottom: 8px;
             color: #c8d0dc;
         }
-        input {
+        input[type="url"] {
             width: 100%;
             padding: 12px 14px;
             border-radius: 12px;
@@ -64,7 +72,7 @@
             font-size: 15px;
             transition: 0.2s;
         }
-        input:focus {
+        input[type="url"]:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
@@ -95,61 +103,32 @@
             background: #1a2233;
         }
 
-        /* === MODE CARDS === */
-        .mode-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 6px;
-        }
-        .mode-card {
+        /* === INFO MODE === */
+        .mode-info {
             background: #0f131c;
-            border: 2px solid #2e384a;
-            border-radius: 16px;
-            padding: 16px 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex: 1;
-            min-width: 150px;
-            text-align: center;
-        }
-        .mode-card:hover {
-            border-color: #4b5a7a;
-            background: #161e2e;
-        }
-        .mode-card.active {
-            border-color: #3b82f6;
-            background: #1a2744;
-            box-shadow: 0 0 20px rgba(59,130,246,0.15);
-            transform: scale(1.02);
-        }
-        .mode-card .mode-title {
-            font-weight: 700;
-            font-size: 18px;
+            border: 1px solid #2a3140;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
             gap: 8px;
         }
-        .mode-card .mode-desc {
-            font-size: 13px;
+        .mode-info .label {
             color: #8b9bb5;
-            margin-top: 4px;
+            font-size: 14px;
         }
-        .mode-card .mode-spec {
-            font-size: 12px;
-            color: #6a7d9e;
-            margin-top: 6px;
-            background: #0b0e14;
-            padding: 4px 10px;
-            border-radius: 30px;
-            display: inline-block;
+        .mode-info .value {
+            font-weight: 600;
+            color: #4ade80;
         }
 
         /* === BUTTON === */
         button[type="submit"] {
             width: 100%;
-            margin-top: 28px;
+            margin-top: 24px;
             padding: 14px;
             background: #3b82f6;
             border: none;
@@ -212,7 +191,6 @@
         }
         .stats .ok { background: #064e3b; color: #6ee7b7; }
         .stats .fail { background: #4c0519; color: #fca5a5; }
-        .hint { color: #8b9bb5; font-size: 13px; margin-top: 4px; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f131c; }
         ::-webkit-scrollbar-thumb { background: #2e384a; border-radius: 8px; }
@@ -222,7 +200,10 @@
 <div class="container">
     <h1>
         ⚡ Keyyss React
-        <small><span class="badge">Unlimited</span></small>
+        <small>
+            <span class="badge">Unlimited</span>
+            <span class="badge-safe">Normal Mode</span>
+        </small>
     </h1>
 
     <form id="testForm">
@@ -248,28 +229,14 @@
         </div>
         <input type="hidden" id="selectedEmojis" value="[]" />
 
-        <!-- MODE SELECTION -->
-        <label>⚙️ Pilih Mode Kecepatan</label>
-        <div class="mode-grid" id="modeGrid">
-            <div class="mode-card active" data-mode="normal">
-                <div class="mode-title">🛡️ Normal (Aman)</div>
-                <div class="mode-desc">Jeda 1000ms · 5x Kirim</div>
-                <div class="mode-spec">1x per emoji</div>
-            </div>
-            <div class="mode-card" data-mode="turbo">
-                <div class="mode-title">⚡ Turbo (Cepat)</div>
-                <div class="mode-desc">Jeda 150ms · 2x Kirim</div>
-                <div class="mode-spec">5x per emoji</div>
-            </div>
-            <div class="mode-card" data-mode="booster">
-                <div class="mode-title">🚀 Booster (Besar)</div>
-                <div class="mode-desc">Jeda 500ms · 5x Kirim</div>
-                <div class="mode-spec">10x per emoji</div>
-            </div>
+        <!-- Informasi Mode (hanya tampilan) -->
+        <div class="mode-info">
+            <span class="label">⚙️ Mode Aktif</span>
+            <span class="value">🛡️ Normal (Aman) — 1x per emoji · Jeda 1 detik · 5x Kirim</span>
         </div>
 
         <button type="submit" id="submitBtn">
-            🚀 Kirim Reaksi (Mode Normal)
+            🚀 Kirim Reaksi
         </button>
     </form>
 
@@ -284,19 +251,18 @@
         const resultDiv = document.getElementById('result');
         const submitBtn = document.getElementById('submitBtn');
         const emojiBtns = document.querySelectorAll('.emoji-btn');
-        const modeCards = document.querySelectorAll('.mode-card');
 
         let selectedEmojis = [];
-        let currentMode = 'normal'; // default
 
-        // === 1. Konfigurasi Mode ===
-        const MODES = {
-            normal: { version: 'v2', multiplier: 1, delayMs: 1000, jumlah: 5, label: 'Normal' },
-            turbo: { version: 'v2', multiplier: 5, delayMs: 150, jumlah: 2, label: 'Turbo' },
-            booster: { version: 'v2', multiplier: 10, delayMs: 500, jumlah: 5, label: 'Booster' }
+        // === Konfigurasi Normal (Hardcoded) ===
+        const CONFIG = {
+            version: 'v2',
+            multiplier: 1,
+            delayMs: 1000,
+            jumlah: 5
         };
 
-        // === 2. Toggle Emoji ===
+        // === Toggle Emoji ===
         emojiBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 const emoji = this.dataset.emoji;
@@ -316,22 +282,7 @@
             });
         });
 
-        // === 3. Pilih Mode (Card) ===
-        modeCards.forEach(card => {
-            card.addEventListener('click', function() {
-                // Hapus active dari semua card
-                modeCards.forEach(c => c.classList.remove('active'));
-                // Aktifkan card yang diklik
-                this.classList.add('active');
-                // Simpan mode
-                currentMode = this.dataset.mode;
-                // Update tombol submit
-                const modeLabel = MODES[currentMode].label;
-                submitBtn.innerHTML = `🚀 Kirim Reaksi (Mode ${modeLabel})`;
-            });
-        });
-
-        // === 4. Submit Form ===
+        // === Submit Form ===
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -341,23 +292,20 @@
             if (!url) { alert('URL wajib diisi!'); return; }
             if (emojis.length === 0) { alert('Pilih minimal 1 emoji!'); return; }
 
-            // Ambil konfigurasi berdasarkan mode yang dipilih
-            const config = MODES[currentMode];
-
             const payload = {
                 url,
                 emojis: emojis,
-                version: config.version,
-                multiplier: config.multiplier,
-                jumlah: config.jumlah,
-                delayMs: config.delayMs
+                version: CONFIG.version,
+                multiplier: CONFIG.multiplier,
+                jumlah: CONFIG.jumlah,
+                delayMs: CONFIG.delayMs
             };
 
             // Disable tombol & tampilkan loading
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loader"></span> Mengirim...';
             resultDiv.style.display = 'block';
-            resultDiv.textContent = `⏳ Memproses (Mode ${config.label})...`;
+            resultDiv.textContent = '⏳ Memproses (Mode Normal)...';
 
             try {
                 const response = await fetch('/api/react', {
@@ -374,8 +322,7 @@
                     text += `📊 Statistik:\n`;
                     text += `   ✅ Berhasil: ${data.data.successCount}\n`;
                     text += `   ❌ Gagal:    ${data.data.failedCount}\n`;
-                    text += `   ⚡ Mode:     ${config.label.toUpperCase()}\n`;
-                    text += `   📈 Multiplier: ${config.multiplier}x\n`;
+                    text += `   ⚡ Mode:     NORMAL (Aman)\n`;
                     text += `━━━━━━━━━━━━━━━━━━━━━\n`;
                     text += `📋 Detail per percobaan:\n`;
                     data.data.results.forEach((r, i) => {
@@ -394,17 +341,13 @@
                 resultDiv.textContent = `❌ Gagal koneksi: ${err.message}`;
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `🚀 Kirim Reaksi (Mode ${config.label})`;
+                submitBtn.innerHTML = '🚀 Kirim Reaksi';
             }
         });
 
-        // === 5. Default: pilih emoji pertama & set mode normal ===
+        // === Default: pilih emoji pertama ===
         const firstBtn = document.querySelector('.emoji-btn');
         if (firstBtn) firstBtn.click();
-
-        // Tandai mode normal sebagai default (sudah ada class active di HTML)
-        // Tapi kita set ulang teks tombol agar sesuai
-        submitBtn.innerHTML = '🚀 Kirim Reaksi (Mode Normal)';
     })();
 </script>
 </body>
