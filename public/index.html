@@ -2,81 +2,96 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Wowo React – Kirim Reaksi</title>
     <style>
-        * { box-sizing: border-box; margin: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #0b0e14;
             color: #e8edf5;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
         }
         .container {
             max-width: 780px;
             width: 100%;
             background: #1a1f2b;
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            border-radius: 28px;
+            padding: 28px 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
             border: 1px solid #2a3140;
         }
-        h1 {
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .header h1 {
             font-size: 26px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-bottom: 2px solid #3b82f6;
-            padding-bottom: 16px;
-            margin-bottom: 24px;
+            gap: 8px;
         }
-        h1 small {
-            font-size: 14px;
-            font-weight: 400;
-            color: #8b9bb5;
-            margin-left: auto;
-        }
-        .badge {
+        .header h1 span {
             background: #2563eb;
-            padding: 4px 14px;
+            padding: 2px 12px;
             border-radius: 30px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
+            color: white;
         }
-        .badge-safe {
+        .header .badge {
             background: #16a34a;
             padding: 4px 14px;
             border-radius: 30px;
             font-size: 13px;
             font-weight: 600;
-            margin-left: 8px;
+            color: white;
         }
+
+        /* Form */
         label {
             display: block;
             font-weight: 600;
-            margin-top: 20px;
+            margin-top: 18px;
             margin-bottom: 8px;
             color: #c8d0dc;
+            font-size: 15px;
         }
-        input[type="url"] {
+        input[type="url"], input[type="text"] {
             width: 100%;
-            padding: 12px 14px;
-            border-radius: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
             border: 1px solid #2e384a;
             background: #0f131c;
             color: #e8edf5;
-            font-size: 15px;
-            transition: 0.2s;
+            font-size: 16px;
+            transition: border 0.2s, box-shadow 0.2s;
         }
-        input[type="url"]:focus {
+        input:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
         }
+        input::placeholder {
+            color: #6a7d9e;
+        }
+
         .emoji-grid {
             display: flex;
             flex-wrap: wrap;
@@ -84,28 +99,30 @@
             margin-top: 6px;
         }
         .emoji-btn {
-            font-size: 30px;
+            font-size: 32px;
             padding: 8px 14px;
             background: #0f131c;
             border: 2px solid #2e384a;
-            border-radius: 14px;
+            border-radius: 16px;
             cursor: pointer;
             transition: 0.15s;
             line-height: 1;
+            user-select: none;
         }
         .emoji-btn.active {
             border-color: #3b82f6;
             background: #1e2a4a;
             transform: scale(1.05);
-            box-shadow: 0 0 12px rgba(59,130,246,0.3);
+            box-shadow: 0 0 14px rgba(59,130,246,0.3);
         }
         .emoji-btn:hover {
             background: #1a2233;
         }
+
         .mode-info {
             background: #0f131c;
             border: 1px solid #2a3140;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 12px 16px;
             margin-top: 20px;
             display: flex;
@@ -121,91 +138,233 @@
         .mode-info .value {
             font-weight: 600;
             color: #4ade80;
+            font-size: 14px;
         }
-        button[type="submit"] {
+
+        button[type="submit"], .btn-test {
             width: 100%;
             margin-top: 24px;
-            padding: 14px;
+            padding: 16px;
             background: #3b82f6;
             border: none;
-            border-radius: 14px;
+            border-radius: 16px;
             color: white;
             font-size: 18px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background 0.2s, transform 0.1s;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
         }
-        button[type="submit"]:hover {
+        button[type="submit"]:hover, .btn-test:hover {
             background: #2563eb;
-            transform: scale(1.01);
         }
-        button[type="submit"]:disabled {
+        button[type="submit"]:active, .btn-test:active {
+            transform: scale(0.98);
+        }
+        button[type="submit"]:disabled, .btn-test:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-        #result {
+
+        #result, #apiTestResult {
             margin-top: 24px;
             padding: 16px;
             background: #0f131c;
             border-radius: 14px;
             white-space: pre-wrap;
             font-size: 13px;
-            max-height: 480px;
+            max-height: 460px;
             overflow-y: auto;
             display: none;
             border: 1px solid #2e384a;
-            font-family: 'JetBrains Mono', monospace;
-            line-height: 1.6;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            line-height: 1.7;
+            color: #d4dcec;
         }
+        #apiTestResult {
+            margin-top: 12px;
+        }
+
         .loader {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border: 3px solid #2e384a;
             border-top-color: #3b82f6;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .stats {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin: 10px 0;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        .stats span {
-            background: #1e2638;
-            padding: 4px 16px;
-            border-radius: 30px;
+
+        /* Dokumentasi API */
+        .api-doc {
+            margin-top: 30px;
+            border-top: 1px solid #2a3140;
+            padding-top: 20px;
+        }
+        .api-doc h3 {
+            color: #8b9bb5;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .api-doc code {
+            background: #0b0e14;
+            padding: 10px 14px;
+            border-radius: 10px;
+            display: block;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #b7c6e0;
+            border: 1px solid #2a3140;
+            margin-top: 4px;
+        }
+        .api-doc .endpoint {
+            color: #4ade80;
             font-weight: 600;
         }
-        .stats .ok { background: #064e3b; color: #6ee7b7; }
-        .stats .fail { background: #4c0519; color: #fca5a5; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f131c; }
-        ::-webkit-scrollbar-thumb { background: #2e384a; border-radius: 8px; }
+        .api-doc .note {
+            color: #8b9bb5;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* Test API section */
+        .test-api-section {
+            margin-top: 24px;
+            border-top: 1px solid #2a3140;
+            padding-top: 20px;
+        }
+        .test-api-section .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .test-api-section .row input {
+            flex: 1;
+            min-width: 200px;
+        }
+        .test-api-section .row .btn-test {
+            flex: 0 0 auto;
+            margin-top: 0;
+            padding: 14px 24px;
+            width: auto;
+            background: #16a34a;
+        }
+        .test-api-section .row .btn-test:hover {
+            background: #15803d;
+        }
+        .test-api-section .curl-box {
+            background: #0b0e14;
+            border: 1px solid #2a3140;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #b7c6e0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            position: relative;
+        }
+        .test-api-section .curl-box .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: #2a3140;
+            border: none;
+            color: #d4dcec;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .test-api-section .curl-box .copy-btn:hover {
+            background: #3a415a;
+        }
+        .test-api-section .response-box {
+            background: #0b0e14;
+            border: 1px solid #2a3140;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #d4dcec;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f131c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e384a;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 16px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .emoji-btn {
+                font-size: 28px;
+                padding: 6px 12px;
+            }
+            button[type="submit"], .btn-test {
+                font-size: 16px;
+                padding: 14px;
+            }
+            #result, #apiTestResult {
+                font-size: 12px;
+                padding: 12px;
+            }
+            .test-api-section .row {
+                flex-direction: column;
+            }
+            .test-api-section .row .btn-test {
+                width: 100%;
+            }
+            .api-doc code {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>
-        ⚡ Wowo React
-        <small>
-            <span class="badge">Unlimited</span>
-            <span class="badge-safe">Normal Mode</span>
-        </small>
-    </h1>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚡ Wowo React <span>v2</span></h1>
+        <div class="badge">Unlimited</div>
+    </div>
 
+    <!-- Form Utama -->
     <form id="testForm">
         <label for="url">🔗 URL Channel / Postingan</label>
         <input type="url" id="url" placeholder="https://whatsapp.com/channel/..." required />
 
-        <label>😀 Pilih Emoji (klik toggle, max 6)</label>
+        <label>😀 Pilih Emoji (maks. 6)</label>
         <div class="emoji-grid" id="emojiGrid">
             <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
             <button type="button" class="emoji-btn" data-emoji="😂">😂</button>
@@ -224,17 +383,53 @@
 
         <div class="mode-info">
             <span class="label">⚙️ Mode Aktif</span>
-            <span class="value">🛡️ Normal (Aman) — 1x per emoji · Jeda 1 detik · 5x Kirim</span>
+            <span class="value">🛡️ Normal (Aman) — 1x per emoji · Jeda 1s · 5x Kirim</span>
         </div>
 
         <button type="submit" id="submitBtn">🚀 Kirim Reaksi</button>
     </form>
 
+    <!-- Result utama -->
     <div id="result"></div>
+
+    <!-- Dokumentasi API -->
+    <div class="api-doc">
+        <h3>🧩 Gunakan via API (curl)</h3>
+        <code>
+curl -X POST https://rchfix.vercel.app/api/react \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://whatsapp.com/channel/...",
+    "emojis": ["❤️", "🔥"],
+    "jumlah": 3,
+    "version": "v2",
+    "multiplier": 1
+  }'
+        </code>
+        <div class="note">
+            ⚡ Parameter opsional: <strong>jumlah</strong> (default 1), <strong>delayMs</strong> (default 1000), <strong>version</strong> (v1/v2, default v2), <strong>multiplier</strong> (default 1).
+        </div>
+    </div>
+
+    <!-- FITUR TEST API -->
+    <div class="test-api-section">
+        <h3 style="color:#8b9bb5; font-size:16px; margin-bottom:10px;">🧪 Test API Langsung</h3>
+        <div class="row">
+            <input type="url" id="testUrl" placeholder="Masukkan URL target untuk test" />
+            <button class="btn-test" id="testApiBtn">🔍 Test API</button>
+        </div>
+        <div id="apiTestResult" style="display:none;"></div>
+        <div id="curlOutput" style="display:none;" class="curl-box">
+            <button class="copy-btn" id="copyCurlBtn">📋 Salin</button>
+            <pre id="curlCommand" style="margin:0; white-space:pre-wrap; word-break:break-all;"></pre>
+        </div>
+        <div id="responseOutput" style="display:none;" class="response-box"></div>
+    </div>
 </div>
 
 <script>
     (function() {
+        // ========== FORM UTAMA ==========
         const form = document.getElementById('testForm');
         const urlInput = document.getElementById('url');
         const selectedEmojisHidden = document.getElementById('selectedEmojis');
@@ -244,7 +439,6 @@
 
         let selectedEmojis = [];
 
-        // Konfigurasi Normal (Hardcoded)
         const CONFIG = {
             version: 'v2',
             multiplier: 1,
@@ -272,24 +466,14 @@
             });
         });
 
-        // Submit
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-
             const url = urlInput.value.trim();
             const emojis = selectedEmojis;
-
             if (!url) { alert('URL wajib diisi!'); return; }
             if (emojis.length === 0) { alert('Pilih minimal 1 emoji!'); return; }
 
-            const payload = {
-                url,
-                emojis: emojis,
-                version: CONFIG.version,
-                multiplier: CONFIG.multiplier,
-                jumlah: CONFIG.jumlah,
-                delayMs: CONFIG.delayMs
-            };
+            const payload = { url, emojis, version: CONFIG.version, multiplier: CONFIG.multiplier, jumlah: CONFIG.jumlah, delayMs: CONFIG.delayMs };
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loader"></span> Mengirim...';
@@ -302,11 +486,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 const data = await response.json();
-
                 if (response.ok && data.success !== undefined) {
-                    // Output ringkas
                     let text = `✅ ${data.message}\n`;
                     text += `━━━━━━━━━━━━━━━━━━━━━\n`;
                     text += `📊 Statistik:\n`;
@@ -315,15 +496,12 @@
                     text += `   ⚡ Mode:     NORMAL (Aman)\n`;
                     text += `━━━━━━━━━━━━━━━━━━━━━\n`;
                     text += `📋 Detail per percobaan:\n`;
-
                     data.data.results.forEach((r, i) => {
                         const status = r.success ? '✅' : '❌';
                         const label = r.success ? 'Success terkirim' : 'Gagal terkirim';
                         const time = r.responseTime || r.elapsed || 'N/A';
-                        // Hardcode worker name
                         text += `  ${i+1}. ${status} ${label} | ⏱️ ${time} | @Wowo-React\n`;
                     });
-
                     resultDiv.textContent = text;
                 } else {
                     resultDiv.textContent = `❌ Error: ${data.message || 'Terjadi kesalahan'}`;
@@ -333,6 +511,102 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '🚀 Kirim Reaksi';
+            }
+        });
+
+        // ========== FITUR TEST API ==========
+        const testUrlInput = document.getElementById('testUrl');
+        const testApiBtn = document.getElementById('testApiBtn');
+        const apiTestResult = document.getElementById('apiTestResult');
+        const curlOutput = document.getElementById('curlOutput');
+        const curlCommand = document.getElementById('curlCommand');
+        const responseOutput = document.getElementById('responseOutput');
+        const copyCurlBtn = document.getElementById('copyCurlBtn');
+
+        testApiBtn.addEventListener('click', async function() {
+            const targetUrl = testUrlInput.value.trim();
+            if (!targetUrl) {
+                alert('Masukkan URL target terlebih dahulu!');
+                return;
+            }
+
+            // Sembunyikan output sebelumnya
+            apiTestResult.style.display = 'none';
+            curlOutput.style.display = 'none';
+            responseOutput.style.display = 'none';
+
+            // Tampilkan loading
+            apiTestResult.style.display = 'block';
+            apiTestResult.textContent = '⏳ Mengirim request test...';
+
+            const payload = {
+                url: targetUrl,
+                emojis: ['❤️', '🔥'], // emoji contoh
+                jumlah: 2,
+                version: 'v2',
+                multiplier: 1,
+                delayMs: 500
+            };
+
+            try {
+                const start = Date.now();
+                const response = await fetch('/api/react', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const elapsed = Date.now() - start;
+                const data = await response.json();
+
+                // Sembunyikan loading
+                apiTestResult.style.display = 'none';
+
+                // Tampilkan curl
+                const curlCmd = `curl -X POST https://rchfix.vercel.app/api/react \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(payload, null, 2)}'`;
+                curlCommand.textContent = curlCmd;
+                curlOutput.style.display = 'block';
+
+                // Tampilkan response
+                const responseText = JSON.stringify(data, null, 2);
+                responseOutput.textContent = `✅ Response (${elapsed}ms):\n${responseText}`;
+                responseOutput.style.display = 'block';
+
+            } catch (err) {
+                apiTestResult.style.display = 'block';
+                apiTestResult.textContent = `❌ Gagal: ${err.message}`;
+            }
+        });
+
+        // Copy curl
+        copyCurlBtn.addEventListener('click', function() {
+            const text = curlCommand.textContent;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const orig = copyCurlBtn.textContent;
+                    copyCurlBtn.textContent = '✅ Disalin!';
+                    setTimeout(() => copyCurlBtn.textContent = orig, 1500);
+                }).catch(() => {
+                    // fallback
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    const orig = copyCurlBtn.textContent;
+                    copyCurlBtn.textContent = '✅ Disalin!';
+                    setTimeout(() => copyCurlBtn.textContent = orig, 1500);
+                });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const orig = copyCurlBtn.textContent;
+                copyCurlBtn.textContent = '✅ Disalin!';
+                setTimeout(() => copyCurlBtn.textContent = orig, 1500);
             }
         });
 
