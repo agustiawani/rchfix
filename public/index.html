@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Keyyss React – Kirim Reaksi</title>
+    <title>Wowo React – Kirim Reaksi</title>
     <style>
         * { box-sizing: border-box; margin: 0; }
         body {
@@ -102,8 +102,6 @@
         .emoji-btn:hover {
             background: #1a2233;
         }
-
-        /* === INFO MODE === */
         .mode-info {
             background: #0f131c;
             border: 1px solid #2a3140;
@@ -124,8 +122,6 @@
             font-weight: 600;
             color: #4ade80;
         }
-
-        /* === BUTTON === */
         button[type="submit"] {
             width: 100%;
             margin-top: 24px;
@@ -152,7 +148,6 @@
             cursor: not-allowed;
             transform: none;
         }
-
         #result {
             margin-top: 24px;
             padding: 16px;
@@ -199,7 +194,7 @@
 <body>
 <div class="container">
     <h1>
-        ⚡ Keyyss React
+        ⚡ Wowo React
         <small>
             <span class="badge">Unlimited</span>
             <span class="badge-safe">Normal Mode</span>
@@ -207,11 +202,9 @@
     </h1>
 
     <form id="testForm">
-        <!-- URL -->
         <label for="url">🔗 URL Channel / Postingan</label>
         <input type="url" id="url" placeholder="https://whatsapp.com/channel/..." required />
 
-        <!-- Emoji -->
         <label>😀 Pilih Emoji (klik toggle, max 6)</label>
         <div class="emoji-grid" id="emojiGrid">
             <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
@@ -229,15 +222,12 @@
         </div>
         <input type="hidden" id="selectedEmojis" value="[]" />
 
-        <!-- Informasi Mode (hanya tampilan) -->
         <div class="mode-info">
             <span class="label">⚙️ Mode Aktif</span>
             <span class="value">🛡️ Normal (Aman) — 1x per emoji · Jeda 1 detik · 5x Kirim</span>
         </div>
 
-        <button type="submit" id="submitBtn">
-            🚀 Kirim Reaksi
-        </button>
+        <button type="submit" id="submitBtn">🚀 Kirim Reaksi</button>
     </form>
 
     <div id="result"></div>
@@ -254,7 +244,7 @@
 
         let selectedEmojis = [];
 
-        // === Konfigurasi Normal (Hardcoded) ===
+        // Konfigurasi Normal (Hardcoded)
         const CONFIG = {
             version: 'v2',
             multiplier: 1,
@@ -262,7 +252,7 @@
             jumlah: 5
         };
 
-        // === Toggle Emoji ===
+        // Toggle Emoji
         emojiBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 const emoji = this.dataset.emoji;
@@ -282,7 +272,7 @@
             });
         });
 
-        // === Submit Form ===
+        // Submit
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -301,7 +291,6 @@
                 delayMs: CONFIG.delayMs
             };
 
-            // Disable tombol & tampilkan loading
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loader"></span> Mengirim...';
             resultDiv.style.display = 'block';
@@ -317,6 +306,7 @@
                 const data = await response.json();
 
                 if (response.ok && data.success !== undefined) {
+                    // Output ringkas
                     let text = `✅ ${data.message}\n`;
                     text += `━━━━━━━━━━━━━━━━━━━━━\n`;
                     text += `📊 Statistik:\n`;
@@ -325,14 +315,15 @@
                     text += `   ⚡ Mode:     NORMAL (Aman)\n`;
                     text += `━━━━━━━━━━━━━━━━━━━━━\n`;
                     text += `📋 Detail per percobaan:\n`;
+
                     data.data.results.forEach((r, i) => {
                         const status = r.success ? '✅' : '❌';
-                        let detail = `  ${i+1}. ${status} ${r.message}`;
-                        if (r.taskId) detail += ` | Task: ${r.taskId}`;
-                        if (r.worker) detail += ` | Worker: ${r.worker}`;
-                        if (r.responseTime) detail += ` | ⏱️ ${r.responseTime}`;
-                        text += detail + '\n';
+                        const label = r.success ? 'Success terkirim' : 'Gagal terkirim';
+                        const time = r.responseTime || r.elapsed || 'N/A';
+                        // Hardcode worker name
+                        text += `  ${i+1}. ${status} ${label} | ⏱️ ${time} | @Wowo-React\n`;
                     });
+
                     resultDiv.textContent = text;
                 } else {
                     resultDiv.textContent = `❌ Error: ${data.message || 'Terjadi kesalahan'}`;
@@ -345,7 +336,7 @@
             }
         });
 
-        // === Default: pilih emoji pertama ===
+        // Default pilih emoji pertama
         const firstBtn = document.querySelector('.emoji-btn');
         if (firstBtn) firstBtn.click();
     })();
