@@ -1,6 +1,6 @@
 // api/react.js
 export default async function handler(req, res) {
-    // CORS untuk semua origin (biar bisa diakses dari mana saja)
+    // CORS untuk akses publik
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -57,35 +57,26 @@ export default async function handler(req, res) {
 
             const data = await response.json();
 
-            if (data.success) {
-                const taskId = data?.data?.result?.task?.id || 'N/A';
-                const worker = data?.data?.result?.task?.worker || 'N/A';
-                const status = data?.data?.result?.task?.status || 'Success';
-                const responseTime = data?.data?.response_time || `${elapsed}ms`;
-                results.push({
-                    success: true,
-                    message: `Berhasil (${status})`,
-                    endpoint: selectedEndpoint,
-                    taskId,
-                    worker,
-                    responseTime,
-                    elapsed: `${elapsed}ms`
-                });
+            const isSuccess = data.success === true;
+            const responseTime = data.data?.response_time || `${elapsed}ms`;
+
+            results.push({
+                success: isSuccess,
+                message: isSuccess ? 'Berhasil' : 'Gagal',
+                responseTime: responseTime
+            });
+
+            if (isSuccess) {
                 successCount++;
             } else {
-                results.push({
-                    success: false,
-                    message: data.error || 'Gagal memproses',
-                    endpoint: selectedEndpoint,
-                    response: data
-                });
                 failedCount++;
             }
         } catch (err) {
+
             results.push({
                 success: false,
-                message: err.message,
-                endpoint: selectedEndpoint,
+                message: 'Gagal',
+                responseTime: 'N/A'
             });
             failedCount++;
         }
@@ -95,6 +86,7 @@ export default async function handler(req, res) {
         }
     }
 
+    // Kirim response 
     return res.status(200).json({
         success: failedCount === 0,
         message: `Selesai: ${successCount} berhasil, ${failedCount} gagal`,
