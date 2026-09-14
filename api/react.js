@@ -1,38 +1,26 @@
 // api/react.js
 export default async function handler(req, res) {
-    // CORS untuk akses publik
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
+    if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }
 
-    const { url, emojis, jumlah = 1, delayMs = 1000, version = 'v2', multiplier = 1 } = req.body;
+    const { url, emojis, jumlah = 1, delayMs = 1000 } = req.body;
 
-    if (!url) {
-        return res.status(400).json({ success: false, message: 'URL wajib diisi' });
-    }
+    if (!url) return res.status(400).json({ success: false, message: 'URL wajib diisi' });
     if (!emojis || !Array.isArray(emojis) || emojis.length === 0) {
         return res.status(400).json({ success: false, message: 'Pilih minimal satu emoji' });
-    }
-    if (jumlah < 1 || jumlah > 100) {
-        return res.status(400).json({ success: false, message: 'Jumlah harus 1-100' });
     }
 
     const reactionStr = emojis.join(',');
 
-    const endpoints = {
-        v1: 'https://webfreereact.ai.studio/api/v1/reaction',
-        v2: 'https://webfreereact.ai.studio/api/v2/reaction'
-    };
-
-    const selectedEndpoint = endpoints[version] || endpoints.v2;
+    // === KONFIGURASI ===
+    const BASE_URL = 'https://reaction-whatsapp.edgeone.dev';
+    const API_KEY = process.env.REACTION_API_KEY; // "C3CENFUP" dari Vercel Env
 
     const results = [];
     let successCount = 0;
@@ -40,62 +28,47 @@ export default async function handler(req, res) {
 
     for (let i = 0; i < jumlah; i++) {
         try {
-            const payload = {
-                url,
-                reaction: reactionStr,
-                version: version,
-                ...(version === 'v2' && { multiplier: multiplier || 1 })
-            };
-
             const startTime = Date.now();
-            const response = await fetch(selectedEndpoint, {
+            const response = await fetch(`${BASE_URL}/react`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': 'application/json',
+                    'Origin': BASE_URL,
+                    'Referer': BASE_URL + '/'
+                },
+                body: JSON.stringify({
+                    link: url,
+                    emoji: reactionStr
+                })
             });
             const elapsed = Date.now() - startTime;
-
-            const data = await response.json();
-
-            const isSuccess = data.success === true;
-            const responseTime = data.data?.response_time || `${elapsed}ms`;
+            const isSuccess = response.status === 200;
 
             results.push({
                 success: isSuccess,
                 message: isSuccess ? 'Berhasil' : 'Gagal',
-                responseTime: responseTime
+                responseTime: `${elapsed}ms`
             });
 
-            if (isSuccess) {
-                successCount++;
-            } else {
-                failedCount++;
-            }
+            if (isSuccess) successCount++;
+            else failedCount++;
+
         } catch (err) {
-
-            results.push({
-                success: false,
-                message: 'Gagal',
-                responseTime: 'N/A'
-            });
+            results.push({ success: false, message: 'Gagal', responseTime: 'N/A' });
             failedCount++;
         }
 
         if (i < jumlah - 1 && delayMs > 0) {
-            await new Promise(resolve => setTimeout(resolve, delayMs));
+            await new Promise(r => setTimeout(r, delayMs));
         }
     }
 
-    // Kirim response 
     return res.status(200).json({
         success: failedCount === 0,
         message: `Selesai: ${successCount} berhasil, ${failedCount} gagal`,
-        data: {
-            successCount,
-            failedCount,
-            results,
-            version,
-            total: jumlah
-        }
+        data: { successCount, failedCount, results, total: jumlah }
     });
 }
